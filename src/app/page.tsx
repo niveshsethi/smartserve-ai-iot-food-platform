@@ -25,7 +25,7 @@ export default function Home() {
             </h1>
             
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              SmartServe uses AI image detection and IoT sensors to safely redistribute food from donors to NGOs, animal shelters, and communities in need.
+              SmartServe uses AI image detection and IoT sensors to safely redistribute food from donors to NGOs, animal shelters, and communities in need across Indore.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
@@ -62,8 +62,8 @@ export default function Home() {
               <div className="text-muted-foreground">Food Quality Rate</div>
             </div>
             <div className="bg-card border border-border rounded-lg p-8 text-center">
-              <div className="text-4xl font-bold text-primary mb-2">15+</div>
-              <div className="text-muted-foreground">Cities Covered</div>
+              <div className="text-4xl font-bold text-primary mb-2">Indore</div>
+              <div className="text-muted-foreground">Service Area</div>
             </div>
           </div>
         </div>
