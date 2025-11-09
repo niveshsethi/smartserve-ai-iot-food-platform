@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import DashboardNav from "@/components/DashboardNav"
 import Chatbot from "@/components/Chatbot"
 import { Button } from "@/components/ui/button"
@@ -9,13 +9,14 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Package, Search, Bell, MapPin, Clock, CheckCircle, TrendingUp, AlertCircle } from "lucide-react"
+import { Package, Search, Bell, MapPin, Clock, CheckCircle, TrendingUp, AlertCircle, ArrowUpDown } from "lucide-react"
 import { useAuth } from "@/lib/auth-context"
 
 export default function RecipientDashboard() {
   const { user } = useAuth()
   const [searchQuery, setSearchQuery] = useState("")
   const [filterType, setFilterType] = useState("all")
+  const [sortBy, setSortBy] = useState("newest")
 
   const availableDonations = [
     {
@@ -23,6 +24,7 @@ export default function RecipientDashboard() {
       title: "Cooked Meals - 100 Servings",
       donor: "Grand Plaza Hotel",
       location: "Downtown, 2.5km away",
+      distance: 2.5,
       foodType: "Cooked Food",
       quantity: "100 servings",
       expiry: "Today, 8:00 PM",
@@ -34,6 +36,7 @@ export default function RecipientDashboard() {
       title: "Fresh Produce - 50kg",
       donor: "Green Market",
       location: "East District, 4.1km away",
+      distance: 4.1,
       foodType: "Fresh Produce",
       quantity: "50kg",
       expiry: "Tomorrow, 6:00 PM",
@@ -45,6 +48,7 @@ export default function RecipientDashboard() {
       title: "Pet Food - 30kg",
       donor: "Pet Store Plus",
       location: "West Side, 3.2km away",
+      distance: 3.2,
       foodType: "Animal Food",
       quantity: "30kg",
       expiry: "3 days",
@@ -77,12 +81,24 @@ export default function RecipientDashboard() {
   }
 
   const isAnimalShelter = user?.role === "shelter"
-  const filteredDonations = availableDonations.filter(donation => {
-    const matchesSearch = donation.title.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesType = filterType === "all" || donation.foodType.toLowerCase().includes(filterType.toLowerCase())
-    const matchesCategory = isAnimalShelter ? donation.category === "animal" : donation.category === "human"
-    return matchesSearch && matchesType && matchesCategory
-  })
+  
+  const filteredDonations = useMemo(() => {
+    let filtered = availableDonations.filter(donation => {
+      const matchesSearch = donation.title.toLowerCase().includes(searchQuery.toLowerCase())
+      const matchesType = filterType === "all" || donation.foodType.toLowerCase().includes(filterType.toLowerCase())
+      const matchesCategory = isAnimalShelter ? donation.category === "animal" : donation.category === "human"
+      return matchesSearch && matchesType && matchesCategory
+    })
+
+    // Sort by selected option
+    if (sortBy === "distance-asc") {
+      filtered = filtered.sort((a, b) => a.distance - b.distance)
+    } else if (sortBy === "distance-desc") {
+      filtered = filtered.sort((a, b) => b.distance - a.distance)
+    }
+
+    return filtered
+  }, [availableDonations, searchQuery, filterType, isAnimalShelter, sortBy])
 
   return (
     <div className="min-h-screen bg-background">
@@ -180,6 +196,16 @@ export default function RecipientDashboard() {
                         <SelectItem value="produce">Fresh Produce</SelectItem>
                         <SelectItem value="packaged">Packaged</SelectItem>
                         <SelectItem value="bakery">Bakery</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={sortBy} onValueChange={setSortBy}>
+                      <SelectTrigger className="w-full md:w-48 neon-border-magenta">
+                        <SelectValue placeholder="Sort by" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="newest">Newest First</SelectItem>
+                        <SelectItem value="distance-asc">Distance: Nearest</SelectItem>
+                        <SelectItem value="distance-desc">Distance: Farthest</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
