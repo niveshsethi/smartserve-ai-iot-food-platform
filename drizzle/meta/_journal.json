@@ -8,6 +8,13 @@
       "when": 1762668659192,
       "tag": "0000_clever_mathemanic",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1764916850872,
+      "tag": "0001_zippy_living_tribunal",
+      "breakpoints": true
     }
   ]
 }

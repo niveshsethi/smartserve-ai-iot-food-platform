@@ -3,7 +3,7 @@ import "./globals.css";
 import VisualEditsMessenger from "../visual-edits/VisualEditsMessenger";
 import ErrorReporter from "@/components/ErrorReporter";
 import Script from "next/script";
-import { AuthProvider } from "@/lib/auth-context";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "SmartServe - AI & IoT Food Redistribution Platform",
@@ -29,9 +29,8 @@ export default function RootLayout({
           data-debug="true"
           data-custom-data='{"appName": "YourApp", "version": "1.0.0", "greeting": "hi"}'
         />
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        {children}
+        <Toaster />
         <VisualEditsMessenger />
       </body>
     </html>

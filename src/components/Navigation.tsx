@@ -2,11 +2,28 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Menu, X } from "lucide-react"
+import { Menu, X, LogOut, User } from "lucide-react"
 import { useState } from "react"
+import { useSession, authClient } from "@/lib/auth-client"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { data: session, isPending, refetch } = useSession()
+  const router = useRouter()
+
+  const handleSignOut = async () => {
+    const { error } = await authClient.signOut()
+    if (error?.code) {
+      toast.error(error.code)
+    } else {
+      localStorage.removeItem("bearer_token")
+      refetch()
+      toast.success("Signed out successfully")
+      router.push("/")
+    }
+  }
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border">
@@ -31,12 +48,30 @@ export default function Navigation() {
             <Link href="/impact" className="text-foreground hover:text-primary transition-colors font-medium">
               Impact & Analytics
             </Link>
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/auth/login">Sign In</Link>
-            </Button>
-            <Button variant="default" size="sm" asChild>
-              <Link href="/auth/signup">Get Started</Link>
-            </Button>
+            
+            {isPending ? (
+              <div className="text-muted-foreground text-sm">Loading...</div>
+            ) : session?.user ? (
+              <>
+                <Link href="/dashboard" className="text-foreground hover:text-primary transition-colors font-medium flex items-center gap-2">
+                  <User className="w-4 h-4" />
+                  Dashboard
+                </Link>
+                <Button variant="outline" size="sm" onClick={handleSignOut}>
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href="/auth/login">Sign In</Link>
+                </Button>
+                <Button variant="default" size="sm" asChild>
+                  <Link href="/auth/signup">Get Started</Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -72,13 +107,33 @@ export default function Navigation() {
             >
               Impact & Analytics
             </Link>
+            
+            {session?.user && (
+              <Link 
+                href="/dashboard" 
+                className="block text-foreground hover:text-primary transition-colors font-medium py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Dashboard
+              </Link>
+            )}
+            
             <div className="flex flex-col space-y-3 pt-4">
-              <Button variant="outline" size="sm" asChild>
-                <Link href="/auth/login">Sign In</Link>
-              </Button>
-              <Button variant="default" size="sm" asChild>
-                <Link href="/auth/signup">Get Started</Link>
-              </Button>
+              {session?.user ? (
+                <Button variant="outline" size="sm" onClick={handleSignOut}>
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </Button>
+              ) : (
+                <>
+                  <Button variant="outline" size="sm" asChild>
+                    <Link href="/auth/login">Sign In</Link>
+                  </Button>
+                  <Button variant="default" size="sm" asChild>
+                    <Link href="/auth/signup">Get Started</Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         )}
